@@ -28,7 +28,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-Install from the tap (cask):
+Install from the tap. GoReleaser publishes prebuilt binaries via Homebrew’s **cask** mechanism (replacing the old `brews` path); the CLI is still command-line only:
 
 ```bash
 brew tap ba0f3/tap

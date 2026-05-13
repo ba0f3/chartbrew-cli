@@ -55,6 +55,9 @@ release:
     owner: ba0f3
     name: chartbrew-cli
 
+# GoReleaser deprecated `brews` (formula generator for prebuilt binaries) in favor of
+# `homebrew_casks` for the same workflow. This is still a CLI; Homebrew uses the cask
+# pipe for vendored release archives, not because the app has a GUI.
 homebrew_casks:
   - name: chartbrew
     ids:

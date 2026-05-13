@@ -1,35 +1,122 @@
-# Agent-First CLI Template
+# Chartbrew CLI
 
-This is a GitHub project template for creating "Agent-First" CLI tools in Go. 
-An "Agent-First" CLI is designed specifically to be executed, orchestrated, and understood by AI agents (like Claude Code, Gemini, GitHub Copilot Workspaces, etc.) as effectively as human users.
+`chartbrew` is an agent-first CLI for the Chartbrew API. It is built for scripts and AI agents that need structured, non-interactive access to teams, dashboards, connections, datasets, data requests, and charts.
 
-## Features
-
-- **Cobra-based CLI**: Standard, robust command parsing and help generation.
-- **Agent-Oriented Documentation**: Includes `AGENTS.md`, `CLAUDE.md`, and a predefined `skill/SKILL.md` to instantly teach AI agents how to use your CLI.
-- **Structured Output**: Native support for returning data in JSON or Markdown to avoid messy stdout parsing.
-- **Secure Secret Handling**: Standardized ways to consume secrets via stdin or env vars to prevent leaks into `.bash_history`.
-- **Non-Interactive First**: Guaranteed to be fully automatable without hanging on `[y/N]` prompts.
-
-## Quick Start
-
-1. Click **Use this template** on GitHub.
-2. Clone your new repository.
-3. Replace `github.com/username/agent-cli-template` with your own module name in `go.mod` and all imports.
-4. Run `make build` to build the binary.
-5. Extend the tool by adding commands to the `cmd/` package.
-
-## Building and Testing
+## Build and Test
 
 ```bash
-make build    # Builds the binary into bin/cli
-make test     # Runs tests
-make lint     # Runs golangci-lint
-make tidy     # Updates go.mod dependencies
+make build    # Builds bin/chartbrew
+make test     # Runs go test -v ./...
+make vet      # Runs go vet ./...
+make fmt      # Formats Go source
+make tidy     # Updates module metadata
 ```
 
-## How to Make It "Agent-First"
+## Configuration
 
-- **Keep Help Text Descriptive**: Agents read `--help` output just like humans. Describe the exact expected formats for flags.
-- **Maintain `skill/SKILL.md`**: Whenever you add features, document them in `skill/SKILL.md` so users can import your tool directly into their agent's skill library.
-- **Avoid TTY Assumptions**: Never assume the tool is running in a fully interactive TTY. Rely on exit codes for success/failure, not just colored console output.
+Configuration resolves in this priority order:
+
+1. CLI flags
+2. Environment variables
+3. `.env` in the current working directory
+4. `~/.config/chartbrew/config.json`
+
+Supported environment variables:
+
+```bash
+export CHARTBREW_API_URL="https://api.chartbrew.com"
+export CHARTBREW_TOKEN="your-api-token"
+```
+
+Config file example:
+
+```json
+{
+  "base_url": "https://api.chartbrew.com",
+  "token": "your-api-token",
+  "output": "json"
+}
+```
+
+Global flags:
+
+```bash
+chartbrew --base-url https://api.chartbrew.com --token "$CHARTBREW_TOKEN" --output json teams list
+chartbrew --config ./chartbrew.json teams list
+```
+
+Prefer `CHARTBREW_TOKEN`, `.env`, or the config file for tokens. The `--token` flag exists for automation override, but command-line secrets can be stored in shell history.
+
+## Commands
+
+All commands write structured JSON by default. Use `--output markdown` for a fenced JSON block or `--output raw` for compact JSON.
+
+Teams:
+
+```bash
+chartbrew teams list
+chartbrew teams get --team-id 123
+chartbrew teams create --data '{"name":"Demo"}'
+chartbrew teams update --team-id 123 --data-file team.json
+```
+
+Dashboards use Chartbrew `project` API endpoints:
+
+```bash
+chartbrew dashboards list --team-id 123
+chartbrew dashboards get --dashboard-id 456
+chartbrew dashboards create --data-file dashboard.json
+chartbrew dashboards update --dashboard-id 456 --data-file dashboard.json
+```
+
+Connections:
+
+```bash
+chartbrew connections list --team-id 123
+chartbrew connections get --team-id 123 --connection-id 456
+chartbrew connections create --team-id 123 --data-file connection.json
+chartbrew connections update --team-id 123 --connection-id 456 --data-file connection.json
+```
+
+Datasets:
+
+```bash
+chartbrew datasets list --team-id 123
+chartbrew datasets get --team-id 123 --dataset-id 456
+chartbrew datasets create --team-id 123 --data-file dataset.json
+chartbrew datasets update --team-id 123 --dataset-id 456 --data-file dataset.json
+```
+
+Data requests:
+
+```bash
+chartbrew data-requests list --team-id 123 --dataset-id 456
+chartbrew data-requests get --team-id 123 --dataset-id 456 --request-id 789
+chartbrew data-requests create --team-id 123 --dataset-id 456 --data-file request.json
+chartbrew data-requests update --team-id 123 --dataset-id 456 --request-id 789 --data-file request.json
+```
+
+Charts:
+
+```bash
+chartbrew charts list --dashboard-id 456
+chartbrew charts get --dashboard-id 456 --chart-id 789
+chartbrew charts create --dashboard-id 456 --data-file chart.json
+chartbrew charts update --dashboard-id 456 --chart-id 789 --data-file chart.json
+```
+
+## JSON Bodies
+
+Create and update commands accept exactly one body source:
+
+```bash
+chartbrew teams create --data '{"name":"Demo"}'
+chartbrew datasets create --team-id 123 --data-file dataset.json
+printf '%s' '{"name":"Demo"}' | chartbrew teams create --data-file -
+```
+
+The CLI validates JSON before sending the request.
+
+## V1 Scope
+
+V1 includes list, get, create, and update commands only. Delete commands are intentionally excluded to keep agent-driven automation safer by default.

@@ -3,12 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/username/agent-cli-template/cmd"
+	"github.com/ba0f3/chartbrew-cli/cmd"
 )
 
 func main() {
 	if err := cmd.Execute(); err != nil {
-		// You can customize the error handling and exit codes based on error type
-		os.Exit(1)
+		os.Exit(cmd.HandleError(err))
 	}
 }

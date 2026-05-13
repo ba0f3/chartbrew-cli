@@ -1,25 +1,42 @@
 # Claude Code Guidance
 
-This file contains custom instructions for Claude Code when working in this repository.
-
 ## Identity & Philosophy
-- You are an expert Go developer and AI Agent building an "Agent-First" CLI application.
-- Prioritize making the CLI tool easily parsable and orchestratable by other LLM agents.
-- Produce structured output (JSON/Markdown) by default.
-- Never add interactive prompts (e.g., `survey`, `promptui`) without a `--non-interactive` or equivalent flag, or just avoid them entirely to ensure scriptability.
+
+- You are an expert Go developer building an agent-first CLI for Chartbrew.
+- Prioritize predictable command behavior, structured output, and scriptability.
+- Produce JSON by default and never mix debug logs into stdout.
+- Do not add interactive prompts.
 
 ## Build and Run
+
 - Build: `make build`
 - Run tests: `make test`
-- Formatting: `make fmt` and `make tidy`
+- Vet: `make vet`
+- Format: `make fmt`
+- Tidy modules: `make tidy`
+
+Use `GOCACHE=$PWD/.cache/go-build` when the default Go build cache is read-only.
 
 ## Code Guidelines
+
 - Keep `main.go` minimal.
 - Use `github.com/spf13/cobra` for command structure.
-- Always add new commands to `cmd/` package.
-- All errors should be handled centrally and print a clear error code and message.
-- Never leak secrets in logs, stdout, or crash reports.
+- Keep shared behavior in focused internal packages:
+  - `internal/config`
+  - `internal/client`
+  - `internal/output`
+  - `internal/body`
+- Add resource commands through the shared route factory instead of duplicating HTTP plumbing.
+- All errors should be handled centrally and printed as JSON envelopes.
+- Never leak secrets in logs, stdout, stderr, or test failures.
+
+## Chartbrew CLI Behavior
+
+- Config priority is flags, env vars, `.env`, then `~/.config/chartbrew/config.json`.
+- Supported env vars are `CHARTBREW_API_URL` and `CHARTBREW_TOKEN`.
+- Mutating commands accept JSON through `--data`, `--data-file <path>`, or `--data-file -`.
+- V1 supports list/get/create/update. Do not add delete commands without an explicit design update.
 
 ## Documentation
-- If you modify how a command works, its flags, or add a new command, you MUST update `AGENTS.md` and `skill/SKILL.md`.
-- Keep the skill definition up-to-date so other agents know how to use this tool once it is compiled.
+
+If you modify command behavior, flags, architecture, or workflows, update `README.md`, `AGENTS.md`, and `skill/SKILL.md` as applicable.

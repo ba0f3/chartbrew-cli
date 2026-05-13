@@ -1,5 +1,5 @@
 # Binary name
-BINARY_NAME=cli
+BINARY_NAME=chartbrew
 
 # Build directory
 BUILD_DIR=bin
@@ -15,7 +15,7 @@ GOFMT=$(GOCMD) fmt
 
 # Versioning (git tags or 'dev')
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-LDFLAGS := -ldflags "-X 'github.com/username/agent-cli-template/cmd.Version=$(VERSION)'"
+LDFLAGS := -ldflags "-X 'github.com/ba0f3/chartbrew-cli/cmd.Version=$(VERSION)'"
 
 .PHONY: all build clean test install lint tidy fmt vet help
 
@@ -48,7 +48,7 @@ vet:
 	$(GOCMD) vet ./...
 
 help:
-	@echo "Makefile for agent-first-cli-template"
+	@echo "Makefile for chartbrew-cli"
 	@echo ""
 	@echo "Usage:"
 	@echo "  make build    - Build the binary"

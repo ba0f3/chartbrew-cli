@@ -14,6 +14,7 @@
 - Vet: `make vet`
 - Format: `make fmt`
 - Tidy modules: `make tidy`
+- Releases: tag `v*` to trigger GoReleaser on GitHub Actions; see `.goreleaser.yaml` and `README.md` for the Homebrew tap.
 
 Use `GOCACHE=$PWD/.cache/go-build` when the default Go build cache is read-only.
 

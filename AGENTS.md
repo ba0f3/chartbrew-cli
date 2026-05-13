@@ -18,6 +18,12 @@ make lint         # golangci-lint run ./... (optional)
 ./bin/chartbrew --help
 ```
 
+## CI and releases
+
+- `.github/workflows/test.yml` runs `go test` and `go vet` on every push and pull request.
+- `.github/workflows/release.yml` runs GoReleaser on `v*` tags; set `HOMEBREW_TAP_GITHUB_TOKEN` for the Homebrew tap repo (see `README.md`).
+- Release configuration is in `.goreleaser.yaml` (builds, archives, GitHub release, `homebrew_casks` publishing to `ba0f3/homebrew-tap`).
+
 If the default Go build cache is not writable in the current sandbox, run commands with:
 
 ```bash

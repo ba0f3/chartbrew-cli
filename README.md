@@ -12,6 +12,35 @@ make fmt      # Formats Go source
 make tidy     # Updates module metadata
 ```
 
+## Releases and Homebrew
+
+GitHub Actions runs `go test` and `go vet` on every push and pull request. Pushing a version tag matching `v*` (for example `v0.1.0`) runs [GoReleaser](https://goreleaser.com/), which creates a GitHub release with archives and updates the Homebrew tap repository.
+
+One-time setup:
+
+1. Create an empty GitHub repository named `homebrew-tap` under the same owner as this project (for example `https://github.com/ba0f3/homebrew-tap`), default branch `main`.
+2. In this repository’s GitHub **Settings → Secrets and variables → Actions**, add `HOMEBREW_TAP_GITHUB_TOKEN`: a personal access token with **Contents: Read and write** on that tap repository (the default `GITHUB_TOKEN` cannot push to another repo).
+
+Then tag and push:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Install from the tap (cask):
+
+```bash
+brew tap ba0f3/tap
+brew install --cask chartbrew
+```
+
+To dry-run a release locally:
+
+```bash
+goreleaser release --snapshot --clean
+```
+
 ## Configuration
 
 Configuration resolves in this priority order:

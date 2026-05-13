@@ -36,7 +36,8 @@ Use `GOCACHE=$PWD/.cache/go-build` when the default Go build cache is read-only.
 - Config priority is flags, env vars, `.env`, then `~/.config/chartbrew/config.json`.
 - Supported env vars are `CHARTBREW_API_URL` and `CHARTBREW_TOKEN`.
 - Mutating commands accept JSON through `--data`, `--data-file <path>`, or `--data-file -`.
-- V1 supports list/get/create/update. Do not add delete commands without an explicit design update.
+- Delete commands are available for documented Chartbrew delete endpoints only: dashboards, datasets, and charts.
+- Delete execution requires `allow_delete: true` in the JSON config file. CLI flags, env vars, and `.env` must not enable deletes.
 
 ## Documentation
 

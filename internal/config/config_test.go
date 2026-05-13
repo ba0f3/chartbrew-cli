@@ -87,6 +87,43 @@ func TestResolveLowerPrioritySources(t *testing.T) {
 	}
 }
 
+func TestResolveAllowDeleteFromConfigFile(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.json")
+
+	if err := os.WriteFile(configPath, []byte(`{"base_url":"https://file.example","token":"file-token","allow_delete":true}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, err := Resolve(Sources{Env: map[string]string{}, ConfigPath: configPath})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.AllowDelete {
+		t.Fatal("AllowDelete = false, want true")
+	}
+}
+
+func TestResolveAllowDeleteCannotBeEnabledByEnvOrFlags(t *testing.T) {
+	cfg, err := Resolve(Sources{
+		FlagBaseURL: "https://flag.example",
+		FlagToken:   "flag-token",
+		Env: map[string]string{
+			EnvBaseURL:         "https://env.example",
+			EnvToken:           "env-token",
+			"ALLOW_DELETE":     "true",
+			"allow_delete":     "true",
+			"CHARTBREW_DELETE": "true",
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.AllowDelete {
+		t.Fatal("AllowDelete = true, want false")
+	}
+}
+
 func TestValidateRequiresBaseURLAndToken(t *testing.T) {
 	if err := (Config{Token: "token"}).Validate(); err == nil {
 		t.Fatal("expected missing base URL error")

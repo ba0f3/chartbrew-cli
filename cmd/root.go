@@ -24,14 +24,15 @@ type requester interface {
 }
 
 type appState struct {
-	baseURL    string
-	token      string
-	configPath string
-	outputFmt  string
-	api        requester
-	stdin      io.Reader
-	stdout     io.Writer
-	stderr     io.Writer
+	baseURL     string
+	token       string
+	configPath  string
+	outputFmt   string
+	allowDelete bool
+	api         requester
+	stdin       io.Reader
+	stdout      io.Writer
+	stderr      io.Writer
 }
 
 func Execute() error {
@@ -74,6 +75,7 @@ func newRootCommand(api requester, stdin io.Reader, stdout, stderr io.Writer) *c
 				return err
 			}
 			state.outputFmt = cfg.Output
+			state.allowDelete = cfg.AllowDelete
 			if state.api == nil {
 				state.api = client.New(cfg.BaseURL, cfg.Token, http.DefaultClient)
 			}

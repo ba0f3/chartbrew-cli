@@ -16,9 +16,10 @@ const (
 )
 
 type Config struct {
-	BaseURL string `json:"base_url"`
-	Token   string `json:"token"`
-	Output  string `json:"output"`
+	BaseURL     string `json:"base_url"`
+	Token       string `json:"token"`
+	Output      string `json:"output"`
+	AllowDelete bool   `json:"allow_delete"`
 }
 
 type Sources struct {
@@ -106,13 +107,16 @@ func readConfigFile(path string) (Config, error) {
 	if len(strings.TrimSpace(string(data))) == 0 {
 		return cfg, nil
 	}
-	var raw map[string]string
-	if err := json.Unmarshal(data, &raw); err != nil {
+	if err := json.Unmarshal(data, &cfg); err != nil {
 		return cfg, fmt.Errorf("parse config file: %w", err)
 	}
-	cfg.BaseURL = first(raw["base_url"], raw["api_url"])
-	cfg.Token = raw["token"]
-	cfg.Output = raw["output"]
+	var aliases struct {
+		APIURL string `json:"api_url"`
+	}
+	if err := json.Unmarshal(data, &aliases); err != nil {
+		return cfg, fmt.Errorf("parse config file: %w", err)
+	}
+	cfg.BaseURL = first(cfg.BaseURL, aliases.APIURL)
 	return cfg, nil
 }
 
@@ -165,6 +169,9 @@ func mergeConfig(dst *Config, src Config) {
 	}
 	if src.Output != "" {
 		dst.Output = src.Output
+	}
+	if src.AllowDelete {
+		dst.AllowDelete = true
 	}
 }
 

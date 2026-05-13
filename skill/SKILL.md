@@ -29,7 +29,8 @@ Config file example:
 {
   "base_url": "https://api.chartbrew.com",
   "token": "your-api-token",
-  "output": "json"
+  "output": "json",
+  "allow_delete": false
 }
 ```
 
@@ -37,7 +38,8 @@ Config file example:
 
 - Use `--output=json` when another tool or agent will parse the result.
 - Do not place sensitive connection passwords in shell history. Put long or sensitive JSON in a file or pipe it through `--data-file -`.
-- Do not expect delete commands in v1. The CLI supports list, get, create, and update.
+- Delete commands exist only for dashboards, datasets, and charts.
+- Delete execution requires `allow_delete: true` in the JSON config file. CLI flags, environment variables, and `.env` cannot enable deletes.
 - Do not use interactive prompt workarounds such as `yes`; this CLI is designed to be non-interactive.
 
 ## Commands
@@ -52,6 +54,7 @@ chartbrew dashboards list --team-id 123
 chartbrew dashboards get --dashboard-id 456
 chartbrew dashboards create --data-file dashboard.json
 chartbrew dashboards update --dashboard-id 456 --data-file dashboard.json
+chartbrew dashboards delete --dashboard-id 456
 
 chartbrew connections list --team-id 123
 chartbrew connections get --team-id 123 --connection-id 456
@@ -62,6 +65,7 @@ chartbrew datasets list --team-id 123
 chartbrew datasets get --team-id 123 --dataset-id 456
 chartbrew datasets create --team-id 123 --data-file dataset.json
 chartbrew datasets update --team-id 123 --dataset-id 456 --data-file dataset.json
+chartbrew datasets delete --team-id 123 --dataset-id 456
 
 chartbrew data-requests list --team-id 123 --dataset-id 456
 chartbrew data-requests get --team-id 123 --dataset-id 456 --request-id 789
@@ -72,6 +76,7 @@ chartbrew charts list --dashboard-id 456
 chartbrew charts get --dashboard-id 456 --chart-id 789
 chartbrew charts create --dashboard-id 456 --data-file chart.json
 chartbrew charts update --dashboard-id 456 --chart-id 789 --data-file chart.json
+chartbrew charts delete --dashboard-id 456 --chart-id 789
 ```
 
 ## JSON Body Input

@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -118,5 +120,36 @@ func TestCommandErrorDoesNotWritePartialSuccessToStdout(t *testing.T) {
 	}
 	if stdout != "" {
 		t.Fatalf("stdout = %q", stdout)
+	}
+}
+
+func TestDeleteCommandRequiresConfigOptIn(t *testing.T) {
+	api := &fakeRequester{}
+	_, _, err := executeTestCommand(api, "", withConfig("datasets", "delete", "--team-id", "7", "--dataset-id", "8")...)
+	if err == nil {
+		t.Fatal("expected delete opt-in error")
+	}
+	if !strings.Contains(err.Error(), "allow_delete") {
+		t.Fatalf("error = %v", err)
+	}
+	if api.method != "" {
+		t.Fatalf("request should not run, got %s %s", api.method, api.path)
+	}
+}
+
+func TestDeleteCommandRunsWhenAllowedByConfigFile(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.json")
+	if err := os.WriteFile(configPath, []byte(`{"base_url":"https://api.example","token":"token","allow_delete":true}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	api := &fakeRequester{}
+	_, _, err := executeTestCommand(api, "", "--config", configPath, "datasets", "delete", "--team-id", "7", "--dataset-id", "8")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if api.method != http.MethodDelete || api.path != "/team/7/datasets/8" {
+		t.Fatalf("request = %s %s", api.method, api.path)
 	}
 }

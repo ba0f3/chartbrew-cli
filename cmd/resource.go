@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -9,12 +10,13 @@ import (
 )
 
 type Route struct {
-	Use       string
-	Short     string
-	Method    string
-	Path      func(values map[string]string) string
-	IDFlags   []string
-	NeedsBody bool
+	Use         string
+	Short       string
+	Method      string
+	Path        func(values map[string]string) string
+	IDFlags     []string
+	NeedsBody   bool
+	Destructive bool
 }
 
 func newResourceCommand(name, short string, routes []Route, state *appState) *cobra.Command {
@@ -51,6 +53,9 @@ func newRouteCommand(route Route, state *appState) *cobra.Command {
 				if err != nil {
 					return err
 				}
+			}
+			if route.Destructive && !state.allowDelete {
+				return errors.New("delete commands require allow_delete: true in the Chartbrew config file")
 			}
 
 			resp, err := state.api.Do(cmd.Context(), route.Method, route.Path(values), reqBody)

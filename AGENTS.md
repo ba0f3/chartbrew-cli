@@ -57,7 +57,8 @@ Resource commands are registered from `cmd/resources.go` through the shared rout
 - Avoid interactive prompts. Every input must work through flags, env vars, config files, or stdin.
 - Do not log or print tokens.
 - Prefer env vars or config files for credentials. `--token` exists for automation override.
-- V1 intentionally has no delete commands.
+- Delete commands are destructive and must be guarded by `allow_delete: true` from the JSON config file. Do not add CLI flags, env vars, or `.env` support for enabling deletes.
+- Only add delete commands for endpoints documented by Chartbrew. Current delete resources are dashboards, datasets, and charts.
 
 ## Project Layout
 

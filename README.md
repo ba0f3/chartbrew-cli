@@ -63,7 +63,8 @@ Config file example:
 {
   "base_url": "https://api.chartbrew.com",
   "token": "your-api-token",
-  "output": "json"
+  "output": "json",
+  "allow_delete": false
 }
 ```
 
@@ -96,6 +97,7 @@ chartbrew dashboards list --team-id 123
 chartbrew dashboards get --dashboard-id 456
 chartbrew dashboards create --data-file dashboard.json
 chartbrew dashboards update --dashboard-id 456 --data-file dashboard.json
+chartbrew dashboards delete --dashboard-id 456
 ```
 
 Connections:
@@ -114,6 +116,7 @@ chartbrew datasets list --team-id 123
 chartbrew datasets get --team-id 123 --dataset-id 456
 chartbrew datasets create --team-id 123 --data-file dataset.json
 chartbrew datasets update --team-id 123 --dataset-id 456 --data-file dataset.json
+chartbrew datasets delete --team-id 123 --dataset-id 456
 ```
 
 Data requests:
@@ -132,6 +135,7 @@ chartbrew charts list --dashboard-id 456
 chartbrew charts get --dashboard-id 456 --chart-id 789
 chartbrew charts create --dashboard-id 456 --data-file chart.json
 chartbrew charts update --dashboard-id 456 --chart-id 789 --data-file chart.json
+chartbrew charts delete --dashboard-id 456 --chart-id 789
 ```
 
 ## JSON Bodies
@@ -146,6 +150,19 @@ printf '%s' '{"name":"Demo"}' | chartbrew teams create --data-file -
 
 The CLI validates JSON before sending the request.
 
-## V1 Scope
+## Delete Safety
 
-V1 includes list, get, create, and update commands only. Delete commands are intentionally excluded to keep agent-driven automation safer by default.
+Delete commands are available only for Chartbrew endpoints documented as deletable: dashboards, datasets, and charts.
+
+Delete execution is disabled by default. To allow deletes, set `allow_delete` to `true` in the JSON config file:
+
+```json
+{
+  "base_url": "https://api.chartbrew.com",
+  "token": "your-api-token",
+  "output": "json",
+  "allow_delete": true
+}
+```
+
+The delete opt-in is config-file-only. CLI flags, environment variables, and `.env` cannot enable delete execution.

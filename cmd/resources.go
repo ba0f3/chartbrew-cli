@@ -32,6 +32,7 @@ func newDashboardsCommand(state *appState) *cobra.Command {
 		{Use: "get", Short: "Get a dashboard", Method: http.MethodGet, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] }, IDFlags: []string{"dashboard-id"}},
 		{Use: "create", Short: "Create a dashboard", Method: http.MethodPost, Path: func(map[string]string) string { return "/project" }, NeedsBody: true},
 		{Use: "update", Short: "Update a dashboard", Method: http.MethodPut, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] }, IDFlags: []string{"dashboard-id"}, NeedsBody: true},
+		{Use: "delete", Short: "Delete a dashboard", Method: http.MethodDelete, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] }, IDFlags: []string{"dashboard-id"}, Destructive: true},
 	}, state)
 }
 
@@ -54,6 +55,7 @@ func newDatasetsCommand(state *appState) *cobra.Command {
 		{Use: "get", Short: "Get a dataset", Method: http.MethodGet, Path: func(v map[string]string) string { return "/team/" + v["team-id"] + "/datasets/" + v["dataset-id"] }, IDFlags: []string{"team-id", "dataset-id"}},
 		{Use: "create", Short: "Create a dataset", Method: http.MethodPost, Path: func(v map[string]string) string { return "/team/" + v["team-id"] + "/datasets" }, IDFlags: []string{"team-id"}, NeedsBody: true},
 		{Use: "update", Short: "Update a dataset", Method: http.MethodPut, Path: func(v map[string]string) string { return "/team/" + v["team-id"] + "/datasets/" + v["dataset-id"] }, IDFlags: []string{"team-id", "dataset-id"}, NeedsBody: true},
+		{Use: "delete", Short: "Delete a dataset", Method: http.MethodDelete, Path: func(v map[string]string) string { return "/team/" + v["team-id"] + "/datasets/" + v["dataset-id"] }, IDFlags: []string{"team-id", "dataset-id"}, Destructive: true},
 	}, state)
 }
 
@@ -80,5 +82,6 @@ func newChartsCommand(state *appState) *cobra.Command {
 		{Use: "get", Short: "Get a chart", Method: http.MethodGet, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] + "/chart/" + v["chart-id"] }, IDFlags: []string{"dashboard-id", "chart-id"}},
 		{Use: "create", Short: "Create a chart", Method: http.MethodPost, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] + "/chart" }, IDFlags: []string{"dashboard-id"}, NeedsBody: true},
 		{Use: "update", Short: "Update a chart", Method: http.MethodPut, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] + "/chart/" + v["chart-id"] }, IDFlags: []string{"dashboard-id", "chart-id"}, NeedsBody: true},
+		{Use: "delete", Short: "Delete a chart", Method: http.MethodDelete, Path: func(v map[string]string) string { return "/project/" + v["dashboard-id"] + "/chart/" + v["chart-id"] }, IDFlags: []string{"dashboard-id", "chart-id"}, Destructive: true},
 	}, state)
 }
